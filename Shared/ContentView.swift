@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-private var myConnectionString: String = ""
+private var myDeviceId: String = "ios"
+private var myHubURL: String = "dawalton-hub.azure-devices.net"
 
 struct iotDemoView: View {
-    @ObservedObject var myHubClient = sIotHubClient(connectionString: myConnectionString)
+    @ObservedObject var myHubClient = AzureIoTHubClientSwift(iothub: myHubURL, deviceId: myDeviceId)
     
     var body: some View {
         VStack {
@@ -35,7 +36,7 @@ struct iotDemoView: View {
 }
 
 struct authenticationItems: View {
-    @ObservedObject var hubClient: sIotHubClient
+    @ObservedObject var hubClient: AzureIoTHubClientSwift
     var body: some View {
         HStack {
             Text("Scan for SAS Key").padding()
@@ -82,7 +83,7 @@ struct metricsItems: View {
     @State private var isSendingTelemetryButtonText: String = "Start"
     @State private var methodName = "nil"
     
-    @ObservedObject var hubClient: sIotHubClient
+    @ObservedObject var hubClient: AzureIoTHubClientSwift
 
     var body: some View {
         HStack {
@@ -130,12 +131,12 @@ struct metricsItems: View {
     }
 }
 
-struct ContentView: View {
-    var body: some View {
-        Text("Hello, world!")
-            .padding()
-    }
-}
+//struct ContentView: View {
+//    var body: some View {
+//        Text("Hello, world!")
+//            .padding()
+//    }
+//}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

@@ -6,9 +6,14 @@
 //
 
 import Foundation
+import MQTT
+import NIOSSL
 import AzureSDKForCSwift
 
-class sIotHubClient: ObservableObject {
+let sem = DispatchSemaphore(value: 0)
+let queue = DispatchQueue(label: "a", qos: .background)
+
+class AzureIoTHubClientSwift: MQTTClientDelegate, ObservableObject {
     
     private var iothub: String = ""
     private var deviceId: String = ""
@@ -34,19 +39,70 @@ class sIotHubClient: ObservableObject {
     var timerDoWork: Timer!
     
     // IoT hub handle
-    private var iotHubClientHandle: IOTHUB_CLIENT_LL_HANDLE!
+    private var azIoTHubClient: az_iot_hub_client!
+
+    // MQTT Client
+    private var mqttClient: MQTTClient
     
-    //Protocol of choice to connect
-    private let iotProtocol: IOTHUB_CLIENT_TRANSPORT_PROVIDER = MQTT_Protocol
-    
-    init(iothub: String, deviceId: String, sasKey: String) {
+    var delegateDispatchQueue: DispatchQueue {
+        queue
+    }
+
+    init(iothub: String, deviceId: String)
+    {
         self.iothub = iothub
         self.deviceId = deviceId
-        self.sasKey = sasKey
+        
+        let caCert = Bundle.main.path(forResource: "baltimore",
+                                      ofType: ".pem",
+                                      inDirectory: "certs/")!
+        let clientCert = Bundle.main.path(forResource: "client",
+                                          ofType: ".pem",
+                                          inDirectory: "certs/")!
+        let keyCert = Bundle.main.path(forResource: "client-key",
+                                       ofType: ".pem",
+                                       inDirectory: "certs/")!
+        let tlsConfiguration = try! TLSConfiguration.forClient(minimumTLSVersion: .tlsv11,
+                                                               maximumTLSVersion: .tlsv12,
+                                                               certificateVerification: .noHostnameVerification,
+                                                               trustRoots: NIOSSLTrustRoots.certificates(NIOSSLCertificate.fromPEMFile(caCert)),
+                                                               certificateChain: NIOSSLCertificate.fromPEMFile(clientCert).map { .certificate($0) },
+                                                               privateKey: .privateKey(.init(file: keyCert, format: .pem)))
+        mqttClient = MQTTClient(
+            host: "\(self.iothub)",
+            port: 8883,
+            clientID: "\(self.deviceId)",
+            cleanSession: true,
+            keepAlive: 30,
+            username: "dawalton-hub.azure-devices.net/ios/?api-version=2018-06-30",
+            password: "",
+            tlsConfiguration: tlsConfiguration
+        )
+        mqttClient.tlsConfiguration = tlsConfiguration
+        mqttClient.delegate = self
     }
     
-    init(connectionString: String) {
-        self.connectionString = connectionString
+/// Needed Functions for MQTTClientDelegate
+    
+    func mqttClient(_ client: MQTTClient, didReceive packet: MQTTPacket) {
+        switch packet {
+        case let packet as ConnAckPacket:
+            print("Connack \(packet)")
+            isConnected = true;
+        default:
+            print(packet)
+        }
+    }
+
+    func mqttClient(_: MQTTClient, didChange state: ConnectionState) {
+        if state == .disconnected {
+            sem.signal()
+        }
+        print(state)
+    }
+
+    func mqttClient(_: MQTTClient, didCatchError error: Error) {
+        print("Error: \(error)")
     }
     
     private func connectionStringCreateFromSAS() -> String {
@@ -81,127 +137,42 @@ class sIotHubClient: ObservableObject {
 
         // This the message
         telemetryMessage = createTelemetryMessage()
+
+        var topicCharArray = [CChar](repeating: 0, count: 100)
+        var topicLength : Int = 0
         
+//        let _ : az_result = az_iot_hub_client_telemetry_get_publish_topic(UnsafeMutablePointer<az_iot_hub_client>(&self.azIoTHubClient), nil, UnsafeMutablePointer<CChar>(mutating: topicCharArray), 100, &topicLength )
         
-        // Construct the message
-        let messageHandle: IOTHUB_MESSAGE_HANDLE = IoTHubMessage_CreateFromByteArray(telemetryMessage, telemetryMessage.utf8.count)
-        
-        if (messageHandle != OpaquePointer.init(bitPattern: 0)) {
-            
-            // Manipulate my self pointer so that the callback can access the class instance
-            let that = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-            
-            print("Send a message")
-            if (IOTHUB_CLIENT_OK == IoTHubClient_LL_SendEventAsync(iotHubClientHandle, messageHandle, mySendConfirmationCallback, that)) {
-                numSentMessages += 1
-            }
-        }
+        print("Send a message")
+        mqttClient.publish(topic: "devices/ios/messages/events/", retain: false, qos: QOS.0, payload: "Hello iOS")
     }
     
     @objc private func doWork() {
         print("Doing work")
-        IoTHubClient_LL_DoWork(iotHubClientHandle)
+        
     }
-    
-    let myConnectionStatusCallback: IOTHUB_CLIENT_CONNECTION_STATUS_CALLBACK = { result, reason, context in
-        
-        var mySelf: sIotHubClient = Unmanaged<sIotHubClient>.fromOpaque(context!).takeUnretainedValue()
-        
-        if (result == IOTHUB_CLIENT_CONNECTION_AUTHENTICATED) {
-            mySelf.isConnected = true;
-        }
-    }
-    
-    // This function will be called when a message confirmation is received
-    //
-    // This is a variable that contains a function which causes the code to be out of the class instance's
-    // scope. In order to interact with the UI class instance address is passed in userContext. It is
-    // somewhat of a machination to convert the UnsafeMutableRawPointer back to a class instance
-    let mySendConfirmationCallback: IOTHUB_CLIENT_EVENT_CONFIRMATION_CALLBACK = { result, userContext in
-        
-        var mySelf: sIotHubClient = Unmanaged<sIotHubClient>.fromOpaque(userContext!).takeUnretainedValue()
-        
-        if (result == IOTHUB_CLIENT_CONFIRMATION_OK) {
-            mySelf.incSentMessagesGood()
-        }
-        else {
-            mySelf.incSentMessagesBad()
-        }
-    }
-    
-    // Note: This is the syntax for an anonymous function. Paremeters go inside the curly braces
-    // instead of outside. The keyword `in` declares the beginning of the body of the closure.
-    // We are creating the function and assigning it to a variable instead of declaring the function by itself.
-    let myReceiveMessageCallback: IOTHUB_CLIENT_MESSAGE_CALLBACK_ASYNC = {
-        (message, userContext) -> (IOTHUBMESSAGE_DISPOSITION_RESULT) in
-        
-        // Cast the context which is `self`
-        var mySelf: sIotHubClient = Unmanaged<sIotHubClient>.fromOpaque(userContext!).takeUnretainedValue()
 
-        var messageId: String! = nil
-        var correlationId: String! = nil
-        var size: Int = 0
-        var buff: UnsafePointer<UInt8>?
-        var messageString: String = ""
-        
-        messageId = String(describing: IoTHubMessage_GetMessageId(message))
-        correlationId = String(describing: IoTHubMessage_GetCorrelationId(message))
-        
-        if (messageId == nil) {
-            messageId = "<nil>"
-        }
-        
-        if correlationId == nil {
-            correlationId = "<nil>"
-        }
-        
-        mySelf.incReceivedMessage()
-        
-        // Get the data from the message
-        var rc: IOTHUB_MESSAGE_RESULT = IoTHubMessage_GetByteArray(message, &buff, &size)
-        
-        if rc == IOTHUB_MESSAGE_OK {
-            print("I got a message")
-        }
-        
-        return IOTHUBMESSAGE_ACCEPTED
+    func connect() throws {
+        mqttClient.connect()
     }
     
     //Connect the device to iothub
     func connectToIoTHub() {
         
-        if(connectionString.isEmpty)
+        do
         {
-            connectionString = connectionStringCreateFromSAS()
+            try self.connect()
+        }
+        catch
+        {
+            print("Coulnd't connect")
         }
         
-        // Create the client handle
-        print("Creating from Connection String")
-        iotHubClientHandle = IoTHubClient_LL_CreateFromConnectionString(connectionString, iotProtocol)
-        
-        // This gets an unmanaged and unretained pointer to the self object. We then pass it to the callback.
-        // Note: Unmanaged means do away with reference counting. Unretained means we don't have to release usage.
-        // Note: UnsafeMutableRawPointer is changeable and does away with Swift memory safety features (like C).
-        let selfPointer = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-        
-        if (IOTHUB_CLIENT_OK != (IoTHubClient_LL_SetConnectionStatusCallback(iotHubClientHandle, myConnectionStatusCallback, selfPointer))) {
-            print("There was a problem setting the connection callback")
-            return
-        }
-        
-        // Set up the message callback
-        if (IOTHUB_CLIENT_OK != (IoTHubClient_LL_SetMessageCallback(iotHubClientHandle, myReceiveMessageCallback, selfPointer))) {
-            print("There was a problem setting the message callback ")
-            return
-        }
-        
-        timerDoWork = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(doWork), userInfo: nil, repeats: true)
     }
     
     func disconectFromIoTHub() {
         stopSendTelemetryMessages()
-        timerDoWork.invalidate()
-        IoTHubClient_LL_Destroy(iotHubClientHandle)
+
         isConnected = false
     }
     

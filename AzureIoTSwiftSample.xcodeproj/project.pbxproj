@@ -21,6 +21,7 @@
 		A1300BE727BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1300BE527BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift */; };
 		A1300BEA27BAB491005CDD06 /* AzureSDKForCSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A1300BE927BAB491005CDD06 /* AzureSDKForCSwift */; };
 		A1300BED27BAB52C005CDD06 /* MQTT in Frameworks */ = {isa = PBXBuildFile; productRef = A1300BEC27BAB52C005CDD06 /* MQTT */; };
+		A1300BF327BAF96E005CDD06 /* certs in Resources */ = {isa = PBXBuildFile; fileRef = A1300BF227BAF96E005CDD06 /* certs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		A1300BCD27BAAFFC005CDD06 /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
 		A1300BCF27BAAFFC005CDD06 /* Tests_macOSLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOSLaunchTests.swift; sourceTree = "<group>"; };
 		A1300BE527BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AzureIoTSwiftViewController.swift; sourceTree = "<group>"; };
+		A1300BF227BAF96E005CDD06 /* certs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = certs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +95,7 @@
 		A1300BA327BAAFFB005CDD06 = {
 			isa = PBXGroup;
 			children = (
+				A1300BF227BAF96E005CDD06 /* certs */,
 				A1300BA827BAAFFB005CDD06 /* Shared */,
 				A1300BB727BAAFFC005CDD06 /* macOS */,
 				A1300BC027BAAFFC005CDD06 /* Tests iOS */,
@@ -282,6 +285,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1300BF327BAF96E005CDD06 /* certs in Resources */,
 				A1300BD527BAAFFC005CDD06 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
