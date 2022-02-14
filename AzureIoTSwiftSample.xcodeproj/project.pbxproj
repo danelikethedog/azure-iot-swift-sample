@@ -17,6 +17,10 @@
 		A1300BD427BAAFFC005CDD06 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1300BAA27BAAFFB005CDD06 /* ContentView.swift */; };
 		A1300BD527BAAFFC005CDD06 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1300BAB27BAAFFC005CDD06 /* Assets.xcassets */; };
 		A1300BD627BAAFFC005CDD06 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1300BAB27BAAFFC005CDD06 /* Assets.xcassets */; };
+		A1300BE627BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1300BE527BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift */; };
+		A1300BE727BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1300BE527BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift */; };
+		A1300BEA27BAB491005CDD06 /* AzureSDKForCSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A1300BE927BAB491005CDD06 /* AzureSDKForCSwift */; };
+		A1300BED27BAB52C005CDD06 /* MQTT in Frameworks */ = {isa = PBXBuildFile; productRef = A1300BEC27BAB52C005CDD06 /* MQTT */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +53,7 @@
 		A1300BC927BAAFFC005CDD06 /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1300BCD27BAAFFC005CDD06 /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
 		A1300BCF27BAAFFC005CDD06 /* Tests_macOSLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOSLaunchTests.swift; sourceTree = "<group>"; };
+		A1300BE527BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AzureIoTSwiftViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +61,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1300BED27BAB52C005CDD06 /* MQTT in Frameworks */,
+				A1300BEA27BAB491005CDD06 /* AzureSDKForCSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +107,7 @@
 				A1300BA927BAAFFB005CDD06 /* AzureIoTSwiftSampleApp.swift */,
 				A1300BAA27BAAFFB005CDD06 /* ContentView.swift */,
 				A1300BAB27BAAFFC005CDD06 /* Assets.xcassets */,
+				A1300BE527BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -157,6 +165,10 @@
 			dependencies = (
 			);
 			name = "AzureIoTSwiftSample (iOS)";
+			packageProductDependencies = (
+				A1300BE927BAB491005CDD06 /* AzureSDKForCSwift */,
+				A1300BEC27BAB52C005CDD06 /* MQTT */,
+			);
 			productName = "AzureIoTSwiftSample (iOS)";
 			productReference = A1300BB027BAAFFC005CDD06 /* AzureIoTSwiftSample.app */;
 			productType = "com.apple.product-type.application";
@@ -249,6 +261,10 @@
 				Base,
 			);
 			mainGroup = A1300BA327BAAFFB005CDD06;
+			packageReferences = (
+				A1300BE827BAB491005CDD06 /* XCRemoteSwiftPackageReference "azure-sdk-for-c-swift" */,
+				A1300BEB27BAB52C005CDD06 /* XCRemoteSwiftPackageReference "swift-mqtt" */,
+			);
 			productRefGroup = A1300BB127BAAFFC005CDD06 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -301,6 +317,7 @@
 			files = (
 				A1300BD327BAAFFC005CDD06 /* ContentView.swift in Sources */,
 				A1300BD127BAAFFC005CDD06 /* AzureIoTSwiftSampleApp.swift in Sources */,
+				A1300BE627BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +327,7 @@
 			files = (
 				A1300BD427BAAFFC005CDD06 /* ContentView.swift in Sources */,
 				A1300BD227BAAFFC005CDD06 /* AzureIoTSwiftSampleApp.swift in Sources */,
+				A1300BE727BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -693,6 +711,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A1300BE827BAB491005CDD06 /* XCRemoteSwiftPackageReference "azure-sdk-for-c-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/danelikethedog/azure-sdk-for-c-swift";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		A1300BEB27BAB52C005CDD06 /* XCRemoteSwiftPackageReference "swift-mqtt" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/matsune/swift-mqtt.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1300BE927BAB491005CDD06 /* AzureSDKForCSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1300BE827BAB491005CDD06 /* XCRemoteSwiftPackageReference "azure-sdk-for-c-swift" */;
+			productName = AzureSDKForCSwift;
+		};
+		A1300BEC27BAB52C005CDD06 /* MQTT */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1300BEB27BAB52C005CDD06 /* XCRemoteSwiftPackageReference "swift-mqtt" */;
+			productName = MQTT;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A1300BA427BAAFFB005CDD06 /* Project object */;
 }
