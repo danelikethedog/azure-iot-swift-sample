@@ -91,14 +91,15 @@ struct metricsItems: View {
             Spacer()
             Button(action: {
                 if(hubClient.isSendingTelemetry) {
+                    print("Stopping Telemetry")
                     isSendingTelemetryButtonText = "Start"
                     hubClient.stopSendTelemetryMessages()
                 }
                 else {
+                    print("Starting Telemetry")
                     isSendingTelemetryButtonText = "Stop"
                     hubClient.startSendTelemetryMessages()
                 }
-                print("\(isSendingTelemetryButtonText)")
             }, label: {
                 Text("\(isSendingTelemetryButtonText)")
             }).padding()

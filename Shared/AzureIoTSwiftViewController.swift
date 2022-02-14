@@ -39,20 +39,40 @@ class AzureIoTHubClientSwift: MQTTClientDelegate, ObservableObject {
     var timerDoWork: Timer!
     
     // IoT hub handle
-    private var azIoTHubClient: az_iot_hub_client!
+    private var azIoTHubClient: az_iot_hub_client! = nil
 
     // MQTT Client
-    private var mqttClient: MQTTClient
+    private var mqttClient: MQTTClient! = nil
     
     var delegateDispatchQueue: DispatchQueue {
         queue
+    }
+    
+    func makeCString(from str: String) -> UnsafeMutablePointer<Int8> {
+        let count = str.utf8CString.count
+        let result: UnsafeMutableBufferPointer<Int8> = UnsafeMutableBufferPointer<Int8>.allocate(capacity: count)
+        _ = result.initialize(from: str.utf8CString)
+        return result.baseAddress!
     }
 
     init(iothub: String, deviceId: String)
     {
         self.iothub = iothub
         self.deviceId = deviceId
+        azIoTHubClient = az_iot_hub_client();
         
+        let iothubPointerString = makeCString(from: iothub)
+        let deviceIdString = makeCString(from: deviceId)
+
+        let iothubSpan: az_span = iothubPointerString.withMemoryRebound(to: UInt8.self, capacity: iothub.count) { hubPtr in
+            return az_span_create(hubPtr, Int32(deviceId.count))
+        }
+        let deviceIdSpan: az_span = deviceIdString.withMemoryRebound(to: UInt8.self, capacity: deviceId.count) { devPtr in
+            return az_span_create(devPtr, Int32(deviceId.count))
+        }
+
+        _ = az_iot_hub_client_init(&azIoTHubClient, iothubSpan, deviceIdSpan, nil)
+
         let caCert = Bundle.main.path(forResource: "baltimore",
                                       ofType: ".pem",
                                       inDirectory: "certs/")!
@@ -88,7 +108,7 @@ class AzureIoTHubClientSwift: MQTTClientDelegate, ObservableObject {
         switch packet {
         case let packet as ConnAckPacket:
             print("Connack \(packet)")
-            isConnected = true;
+            DispatchQueue.main.async { self.isConnected = true; }
         default:
             print(packet)
         }
@@ -135,16 +155,14 @@ class AzureIoTHubClientSwift: MQTTClientDelegate, ObservableObject {
     /// Sends a message to the IoT hub
     @objc private func sendMessage() {
 
-        // This the message
-        telemetryMessage = createTelemetryMessage()
-
-        var topicCharArray = [CChar](repeating: 0, count: 100)
+        var topicCharArray = [CChar](repeating: 0, count: 50)
         var topicLength : Int = 0
         
-//        let _ : az_result = az_iot_hub_client_telemetry_get_publish_topic(UnsafeMutablePointer<az_iot_hub_client>(&self.azIoTHubClient), nil, UnsafeMutablePointer<CChar>(mutating: topicCharArray), 100, &topicLength )
+        let _ : az_result = az_iot_hub_client_telemetry_get_publish_topic(&azIoTHubClient, nil, &topicCharArray, 100, &topicLength )
         
-        print("Send a message")
-        mqttClient.publish(topic: "devices/ios/messages/events/", retain: false, qos: QOS.0, payload: "Hello iOS")
+        let telem_payload = "Hello iOS"
+        print("Sending a message: \(telem_payload)")
+        mqttClient.publish(topic: String(cString: topicCharArray), retain: false, qos: QOS.0, payload: telem_payload)
     }
     
     @objc private func doWork() {
@@ -165,7 +183,7 @@ class AzureIoTHubClientSwift: MQTTClientDelegate, ObservableObject {
         }
         catch
         {
-            print("Coulnd't connect")
+            print("Couldn't connect!")
         }
         
     }
