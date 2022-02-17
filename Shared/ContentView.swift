@@ -7,17 +7,14 @@
 
 import SwiftUI
 
-private var myDeviceId: String = "ios"
-private var myHubURL: String = "dawalton-hub.azure-devices.net"
-
 struct iotDemoView: View {
-    @ObservedObject var myHubClient = AzureIoTHubClientSwift(iothub: myHubURL, deviceId: myDeviceId)
+    @ObservedObject var myHubClient = AzureIoTHubClientSwift(myScopeID: myScopeID, myRegistrationID: myRegistrationID)
     
     var body: some View {
         VStack {
             Group {
                 HStack {
-                    Text("Azure C SDK on iOS")
+                    Text("Azure SDK for C on iOS")
                         .font(.title)
                         .fontWeight(.heavy)
                         .foregroundColor(/*@START_MENU_TOKEN@*/Color(hue: 0.66, saturation: 0.97, brightness: 0.664)/*@END_MENU_TOKEN@*/)
@@ -25,9 +22,9 @@ struct iotDemoView: View {
                     Spacer()
                 }
                 Divider()
-                authenticationItems(hubClient: myHubClient)
+                authenticationItems(iotClient: myHubClient)
                 Divider()
-                metricsItems(hubClient: myHubClient)
+                metricsItems(iotClient: myHubClient)
                 Divider()
                 Spacer()
             }
@@ -36,41 +33,41 @@ struct iotDemoView: View {
 }
 
 struct authenticationItems: View {
-    @ObservedObject var hubClient: AzureIoTHubClientSwift
+    @ObservedObject var iotClient: AzureIoTHubClientSwift
     var body: some View {
+        Divider()
         HStack {
-            Text("Scan for SAS Key").padding()
+            Text("Start DPS").padding()
             Spacer()
             Button(action: {
-                print("Scan selected")
+                iotClient.startDPSWorkflow()
             }, label: {
-                Text("Scan")
+                Text("Run")
             }).padding()
+        }
+        HStack {
+            Text("Provisioning Status").padding()
+            Spacer()
+            if(iotClient.isProvisioned) {
+                Text("Provisioned").foregroundColor(Color.green).padding()
+            } else {
+                Text("Not Provisioned").foregroundColor(Color.red).padding()
+            }
         }
         Divider()
         HStack {
             Text("Connect to IoT Hub").padding()
             Spacer()
             Button(action: {
-                if(hubClient.isConnected)
-                {
-                    hubClient.disconectFromIoTHub()
-                } else {
-                    hubClient.connectToIoTHub()
-                }
+                iotClient.startIoTHubWorkflow()
             }, label: {
-                if(hubClient.isConnected)
-                {
-                    Text("Disconnect")
-                } else {
-                    Text("Connect")
-                }
+                Text("Connect")
             }).padding()
         }
         HStack {
             Text("Connection Status").padding()
             Spacer()
-            if(hubClient.isConnected) {
+            if(iotClient.isHubConnected) {
                 Text("Connected").foregroundColor(Color.green).padding()
             } else {
                 Text("Disconnected").foregroundColor(Color.red).padding()
@@ -80,64 +77,35 @@ struct authenticationItems: View {
 }
 
 struct metricsItems: View {
-    @State private var isSendingTelemetryButtonText: String = "Start"
     @State private var methodName = "nil"
-    
-    @ObservedObject var hubClient: AzureIoTHubClientSwift
+
+    @ObservedObject var iotClient: AzureIoTHubClientSwift
 
     var body: some View {
         HStack {
-            Text("Send Telemetry").padding()
+            Text("Send Telemetry Message").padding()
             Spacer()
             Button(action: {
-                if(hubClient.isSendingTelemetry) {
-                    print("Stopping Telemetry")
-                    isSendingTelemetryButtonText = "Start"
-                    hubClient.stopSendTelemetryMessages()
-                }
-                else {
-                    print("Starting Telemetry")
-                    isSendingTelemetryButtonText = "Stop"
-                    hubClient.startSendTelemetryMessages()
-                }
+                iotClient.sendTelemetryMessage()
             }, label: {
-                Text("\(isSendingTelemetryButtonText)")
+                Text("Send")
             }).padding()
-        }
-        HStack {
-            Text("Last Sent Message").padding()
-            Spacer()
-            Text("<\(hubClient.telemetryMessage)>").padding()
         }
         HStack {
             Text("Messages Sent").padding()
             Spacer()
             VStack {
                 Text("Sent")
-                Text("\(hubClient.numSentMessages)")
+                Text("\(iotClient.numSentMessages)")
             }.padding()
             VStack {
-                Text("+")
+                Text("Confirmed")
                     .foregroundColor(Color.green)
-                Text("\(hubClient.numSentMessagesGood)")
-                    .foregroundColor(Color.green)
-            }.padding()
-            VStack {
-                Text("-")
-                    .foregroundColor(Color.red)
-                Text("\(hubClient.numSentMessagesBad)")
-                    .foregroundColor(Color.red)
+                Text("\(iotClient.numSentMessagesGood)")
             }.padding()
         }
     }
 }
-
-//struct ContentView: View {
-//    var body: some View {
-//        Text("Hello, world!")
-//            .padding()
-//    }
-//}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

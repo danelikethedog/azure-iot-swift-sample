@@ -22,6 +22,11 @@
 		A1300BEA27BAB491005CDD06 /* AzureSDKForCSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A1300BE927BAB491005CDD06 /* AzureSDKForCSwift */; };
 		A1300BED27BAB52C005CDD06 /* MQTT in Frameworks */ = {isa = PBXBuildFile; productRef = A1300BEC27BAB52C005CDD06 /* MQTT */; };
 		A1300BF327BAF96E005CDD06 /* certs in Resources */ = {isa = PBXBuildFile; fileRef = A1300BF227BAF96E005CDD06 /* certs */; };
+		A1A4074427BDAA3000353276 /* DemoIoTClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A4074327BDAA3000353276 /* DemoIoTClient.swift */; };
+		A1A4074527BDAA3000353276 /* DemoIoTClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A4074327BDAA3000353276 /* DemoIoTClient.swift */; };
+		A1A4074827BDBCBD00353276 /* CAzureSDKForCSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A1A4074727BDBCBD00353276 /* CAzureSDKForCSwift */; };
+		A1A4074A27BDBF7300353276 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A4074927BDBF7300353276 /* config.swift */; };
+		A1A4074B27BDBF7300353276 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A4074927BDBF7300353276 /* config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +61,8 @@
 		A1300BCF27BAAFFC005CDD06 /* Tests_macOSLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOSLaunchTests.swift; sourceTree = "<group>"; };
 		A1300BE527BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AzureIoTSwiftViewController.swift; sourceTree = "<group>"; };
 		A1300BF227BAF96E005CDD06 /* certs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = certs; sourceTree = "<group>"; };
+		A1A4074327BDAA3000353276 /* DemoIoTClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoIoTClient.swift; sourceTree = "<group>"; };
+		A1A4074927BDBF7300353276 /* config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +72,7 @@
 			files = (
 				A1300BED27BAB52C005CDD06 /* MQTT in Frameworks */,
 				A1300BEA27BAB491005CDD06 /* AzureSDKForCSwift in Frameworks */,
+				A1A4074827BDBCBD00353276 /* CAzureSDKForCSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +109,7 @@
 				A1300BC027BAAFFC005CDD06 /* Tests iOS */,
 				A1300BCC27BAAFFC005CDD06 /* Tests macOS */,
 				A1300BB127BAAFFC005CDD06 /* Products */,
+				A1A4074627BDBCBD00353276 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -111,6 +120,8 @@
 				A1300BAA27BAAFFB005CDD06 /* ContentView.swift */,
 				A1300BAB27BAAFFC005CDD06 /* Assets.xcassets */,
 				A1300BE527BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift */,
+				A1A4074327BDAA3000353276 /* DemoIoTClient.swift */,
+				A1A4074927BDBF7300353276 /* config.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -152,6 +163,13 @@
 			path = "Tests macOS";
 			sourceTree = "<group>";
 		};
+		A1A4074627BDBCBD00353276 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -171,6 +189,7 @@
 			packageProductDependencies = (
 				A1300BE927BAB491005CDD06 /* AzureSDKForCSwift */,
 				A1300BEC27BAB52C005CDD06 /* MQTT */,
+				A1A4074727BDBCBD00353276 /* CAzureSDKForCSwift */,
 			);
 			productName = "AzureIoTSwiftSample (iOS)";
 			productReference = A1300BB027BAAFFC005CDD06 /* AzureIoTSwiftSample.app */;
@@ -321,6 +340,8 @@
 			files = (
 				A1300BD327BAAFFC005CDD06 /* ContentView.swift in Sources */,
 				A1300BD127BAAFFC005CDD06 /* AzureIoTSwiftSampleApp.swift in Sources */,
+				A1A4074427BDAA3000353276 /* DemoIoTClient.swift in Sources */,
+				A1A4074A27BDBF7300353276 /* config.swift in Sources */,
 				A1300BE627BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -331,6 +352,8 @@
 			files = (
 				A1300BD427BAAFFC005CDD06 /* ContentView.swift in Sources */,
 				A1300BD227BAAFFC005CDD06 /* AzureIoTSwiftSampleApp.swift in Sources */,
+				A1A4074527BDAA3000353276 /* DemoIoTClient.swift in Sources */,
+				A1A4074B27BDBF7300353276 /* config.swift in Sources */,
 				A1300BE727BAB3E5005CDD06 /* AzureIoTSwiftViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -745,6 +768,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A1300BEB27BAB52C005CDD06 /* XCRemoteSwiftPackageReference "swift-mqtt" */;
 			productName = MQTT;
+		};
+		A1A4074727BDBCBD00353276 /* CAzureSDKForCSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1300BE827BAB491005CDD06 /* XCRemoteSwiftPackageReference "azure-sdk-for-c-swift" */;
+			productName = CAzureSDKForCSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
