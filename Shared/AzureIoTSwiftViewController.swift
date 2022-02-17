@@ -64,7 +64,7 @@ class AzureIoTHubClientSwift: ObservableObject {
     
     public func startIoTHubWorkflow()
     {
-        hubDemoHubClient = DemoHubClient(iothub: provisioningDemoClient.assignedHub, deviceId: provisioningDemoClient.assignedDeviceID)
+        hubDemoHubClient = DemoHubClient(iothub: provisioningDemoClient.assignedHub, deviceId: provisioningDemoClient.assignedDeviceID, telemCallback: telemAckCallback)
 
         hubDemoHubClient.connectToIoTHub()
         
@@ -77,7 +77,7 @@ class AzureIoTHubClientSwift: ObservableObject {
     
     public func sendTelemetryMessage()
     {
-        self.hubDemoHubClient.sendMessage(telemCallback: telemAckCallback)
+        self.hubDemoHubClient.sendMessage()
         DispatchQueue.main.async { self.numSentMessages = self.numSentMessages + 1 }
     }
 }

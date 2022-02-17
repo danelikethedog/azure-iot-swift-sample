@@ -35,7 +35,6 @@ struct iotDemoView: View {
 struct authenticationItems: View {
     @ObservedObject var iotClient: AzureIoTHubClientSwift
     var body: some View {
-        Divider()
         HStack {
             Text("Start DPS").padding()
             Spacer()

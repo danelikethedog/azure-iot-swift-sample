@@ -146,7 +146,7 @@ class DemoHubClient: MQTTClientDelegate {
         queue
     }
 
-    public init(iothub: String, deviceId: String)
+    public init(iothub: String, deviceId: String, telemCallback: @escaping () -> Void)
     {
         AzHubClient = AzureIoTHubClient(iothubUrl: iothub, deviceId: deviceId)
 
@@ -171,6 +171,8 @@ class DemoHubClient: MQTTClientDelegate {
         )
         mqttClient.tlsConfiguration = tlsConfiguration
         mqttClient.delegate = self
+
+        telemetryAckCallback = telemCallback
     }
 
 /// Needed Functions for MQTTClientDelegate
@@ -209,14 +211,12 @@ class DemoHubClient: MQTTClientDelegate {
 /// ****************** PUBLIC ******************** ///
 
 /// Sends a message to the IoT hub
-    public func sendMessage(telemCallback: @escaping () -> Void) {
+    public func sendMessage() {
         let swiftString = AzHubClient.GetTelemetryPublishTopic()
 
         let telem_payload = "Hello iOS"
         print("[IoT Hub] Sending a message to topic: \(swiftString)")
         print("[IoT Hub] Sending a message: \(telem_payload)")
-        
-        self.telemetryAckCallback = telemCallback
 
         mqttClient.publish(topic: swiftString, retain: false, qos: QOS.1, payload: telem_payload)
     }
